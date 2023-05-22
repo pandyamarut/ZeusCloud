@@ -87,28 +87,27 @@ async function getAssetRelationGraph(setGraph: any, resource_type: string, query
     }
 }
 
-async function getSelectedEdgeInfo(edgeID: number | null,setEdgeInfo:any,srcNode:GraphNodeType,targetNode:GraphNodeType) {
+async function getSelectedEdgeInfo(edgeID: number | null, setEdgeInfo: any, srcNode: GraphNodeType, targetNode: GraphNodeType) {
     try {
-        console.log(`edgeid=${edgeID}, source=${srcNode.display_id}`)
         if (edgeID == null) {
             setEdgeInfo(
                 {
                     data: {},
                     edgeID: edgeID,
                     error: "",
-                    source:null,
-                    target:null
+                    source: null,
+                    target: null
                 }
             )
         }
         // @ts-ignore
         const edgeInfoEndpoint = window._env_.REACT_APP_API_DOMAIN + "/api/getEdgeInfo";
         const response = await axios.get(edgeInfoEndpoint,
-            { params: { edge_id:edgeID } });
+            { params: { edge_id: edgeID } });
 
         setEdgeInfo({
             data: response.data,
-            edgeID:edgeID,
+            edgeID: edgeID,
             error: '',
             source: srcNode,
             target: targetNode
@@ -129,22 +128,22 @@ async function getSelectedEdgeInfo(edgeID: number | null,setEdgeInfo:any,srcNode
 
         setEdgeInfo({
             data: {},
-            edgeID:undefined,
+            edgeID: undefined,
             error: "",
-            source:null,
-            target:null
+            source: null,
+            target: null
         });
     }
 }
 
-async function getNodeInfoData(setAssetInfo: any, assetCategory: string, display_id: string,graphID:string) {
+async function getNodeInfoData(setAssetInfo: any, assetCategory: string, display_id: string, graphID: string) {
     try {
         // @ts-ignore
         const assetCategoryEndpoint = window._env_.REACT_APP_API_DOMAIN + "/api/getAssetInventory";
         const response = await axios.get(assetCategoryEndpoint,
             { params: { asset_category: assetCategory } }
         );
-        let assetInfoData:Array<any> = response.data.filter((assetObj: any) => {
+        let assetInfoData: Array<any> = response.data.filter((assetObj: any) => {
             switch (assetCategory) {
                 case "iamUsers":
                 case "iamRoles":
@@ -161,8 +160,8 @@ async function getNodeInfoData(setAssetInfo: any, assetCategory: string, display
             }
         });
 
-        if(assetInfoData.length>0){
-            assetInfoData[0]["graphID"]=graphID
+        if (assetInfoData.length > 0) {
+            assetInfoData[0]["graphID"] = graphID
         }
 
         setAssetInfo({
@@ -184,7 +183,7 @@ async function getNodeInfoData(setAssetInfo: any, assetCategory: string, display
         }
         setAssetInfo({
             data: [],
-            assetInstance:null,
+            assetInstance: null,
             error: message
         });
     }
@@ -229,25 +228,25 @@ export default function Explore() {
     const defaultActionStr = S3ActionList[0];
     const [actionStr, setActionStr] = useState(defaultActionStr);
 
-    const initNodeInfo:{
+    const initNodeInfo: {
         data: [],
         assetInstance: any,
         error: string
-    } = { data: [],assetInstance:null,  error: "" }
+    } = { data: [], assetInstance: null, error: "" }
     const [selectedNodeInfo, setNodeInfo] = useState(initNodeInfo);
     const [allTableRows, setAllRows] = useState<TableRow[]>([]);
-    const initEdgeInfo:{
-        data:{[property:string]:string},
-        edgeID: number|null|undefined,
-        error:string,
-        source: GraphNodeType|null,
-        target: GraphNodeType|null
+    const initEdgeInfo: {
+        data: { [property: string]: string },
+        edgeID: number | null | undefined,
+        error: string,
+        source: GraphNodeType | null,
+        target: GraphNodeType | null
     } = {
         data: {},
         edgeID: undefined,
         error: "",
-        source:null,
-        target:null
+        source: null,
+        target: null
     }
     const [selectedEdgeInfo, setEdgeInfo] = useState(initEdgeInfo)
 
@@ -258,7 +257,6 @@ export default function Explore() {
     }, [])
 
     useEffect(() => {
-        console.log("graph=", graph);
     }, [graph])
 
 
@@ -285,32 +283,32 @@ export default function Explore() {
     }, [searchFilter, exploreAssetsInfo, isSelected])
 
     useEffect(() => {
-        
+
         (selectedNodeInfo.assetInstance && selectedNodeInfo.data.length > 0) ? setAllRows(selectedNodeInfo.assetInstance?.getAllRows(selectedNodeInfo)) : setAllRows([]);
     }, [selectedNodeInfo])
 
     useEffect(() => {
-        (selectedEdgeInfo.edgeID!==undefined || allTableRows.length > 0) && tableScrollRef.current?.scrollIntoView({ behavior: "smooth" })
-    }, [allTableRows, tableScrollRef,selectedEdgeInfo])
+        (selectedEdgeInfo.edgeID !== undefined || allTableRows.length > 0) && tableScrollRef.current?.scrollIntoView({ behavior: "smooth" })
+    }, [allTableRows, tableScrollRef, selectedEdgeInfo])
 
     const handleSearchChange = (e: React.FormEvent<HTMLInputElement>) => {
         setSearchFilter(e.currentTarget.value);
         // setSelected(false);
         // setAsset(emptyAsset);
     }
-    const onFocus = ()=>{
+    const onFocus = () => {
         setFilteredAssets(exploreAssetsInfo.data)
     }
-    const removeSelectedStyle = (graph: Graph,e:any)=>{
-        graph.getNodes().forEach(node=>{
-            if(e.item.getID()!==node.getID()){
-                node.setState("selected",false)
+    const removeSelectedStyle = (graph: Graph, e: any) => {
+        graph.getNodes().forEach(node => {
+            if (e.item.getID() !== node.getID()) {
+                node.setState("selected", false)
             }
         })
 
-        graph.getEdges().forEach(edge=>{
-            if(e.item.getID()!==edge.getID()){
-                edge.setState("selected",false)
+        graph.getEdges().forEach(edge => {
+            if (e.item.getID() !== edge.getID()) {
+                edge.setState("selected", false)
             }
         })
     }
@@ -330,34 +328,34 @@ export default function Explore() {
             graph.setItemState(e.item, 'hover', false);
         });
 
-        graph.on('node:click', (e:any) => {
+        graph.on('node:click', (e: any) => {
             const node = e.item?.getModel();
 
-            removeSelectedStyle(graph,e);
-            graph.setItemState(e.item,"selected",true)
+            removeSelectedStyle(graph, e);
+            graph.setItemState(e.item, "selected", true)
 
             setEdgeInfo(initEdgeInfo);
             for (let assetObj of exploreAssetsInfo.data) {
                 if (assetObj.id === node?.display_id) {
-                    getNodeInfoData(setNodeInfo, assetObj.category, node?.display_id,node.id);
+                    getNodeInfoData(setNodeInfo, assetObj.category, node?.display_id, node.id);
                     break;
                 }
             }
         })
-        graph.on('edge:click', (e:any) => {
+        graph.on('edge:click', (e: any) => {
             const edge = e.item?.getModel();
             let srcNode
             let targetNode
 
-            removeSelectedStyle(graph,e)
-            graph.setItemState(e.item,"selected",true)
+            removeSelectedStyle(graph, e)
+            graph.setItemState(e.item, "selected", true)
 
             setNodeInfo(initNodeInfo);
-            if (e.item && 'getSource' in e.item){
-                 srcNode = e.item?.getSource().getModel()
-                 targetNode = e.item?.getTarget().getModel()
+            if (e.item && 'getSource' in e.item) {
+                srcNode = e.item?.getSource().getModel()
+                targetNode = e.item?.getTarget().getModel()
             }
-            getSelectedEdgeInfo(edge?.edge_id as number|null,setEdgeInfo,srcNode,targetNode)
+            getSelectedEdgeInfo(edge?.edge_id as number | null, setEdgeInfo, srcNode, targetNode)
         })
     }, [exploreAssetsInfo])
 
@@ -408,7 +406,7 @@ export default function Explore() {
                                                 <div className="text-sm"
                                                     onClick={() => {
                                                         // @ts-ignore
-                                                        posthog.capture(`${window._env_.REACT_APP_ENVIRONMENT} Asset Selected in Access Explorer`,{environment: window._env_.REACT_APP_ENVIRONMENT})
+                                                        posthog.capture(`${window._env_.REACT_APP_ENVIRONMENT} Asset Selected in Access Explorer`, { environment: window._env_.REACT_APP_ENVIRONMENT })
                                                         setSearchFilter("");
                                                         setAsset(assetObj);
                                                         setSelected(true);
@@ -464,9 +462,9 @@ export default function Explore() {
                     </div>
 
                     <div ref={tableScrollRef} className="mt-8 mb-4" >
-                            <DisplayEdgeInfo edgeInfo={selectedEdgeInfo} />
+                        <DisplayEdgeInfo edgeInfo={selectedEdgeInfo} />
                         {selectedNodeInfo.assetInstance !== null && allTableRows.length > 0 &&
-                            <div  className="mt-3 overflow-scroll w-full shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                            <div className="mt-3 overflow-scroll w-full shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                                 <TableComp
                                     tableFixed={true}
                                     tableColumnHeaders={selectedNodeInfo.assetInstance?.tableColumnHeaders}
@@ -476,7 +474,7 @@ export default function Explore() {
                             </div>
                         }
                     </div>
-                    
+
                 </div>
             </div>
         </div>
